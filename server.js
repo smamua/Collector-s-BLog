@@ -21,6 +21,10 @@ var postsModel = require( "./data.js" );
 
 server.get("/posts", function (req, res) {
   postsModel.find().then(function(posts){
+    var reversed_list = [];
+    posts.forEach(function (post) {
+      reversed_list.unshift(post);
+    })
     var response = {
       posts: posts
     }
@@ -70,6 +74,18 @@ server.post("/posts", function (req, res) {
   // res.send()
 })
 
+server.delete("/posts/:id", function (req, res) {
+  postsModel.findByIdAndDelete(req.params.id).then(function () {
+    res.status(204)
+    res.send()
+  }).catch(function (error) {
+    var response = {
+      msg: error.message
+    };
+    res.status(400);
+    res.json(response);
+  })
+})
 mongoose.connect("mongodb+srv://smamua:smamua@cluster0-1j385.mongodb.net/Blog?retryWrites=true&w=majority", {
   useNewUrlParser: true
 }).then(function () {
