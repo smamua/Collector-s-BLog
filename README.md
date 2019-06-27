@@ -1,3 +1,1 @@
-# Collector-s-BLog
-
-# ...
+# collector_s_blog
