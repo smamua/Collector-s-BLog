@@ -1,5 +1,7 @@
 const express = require( "express" );
 const cors = require( "cors" );
+const mongoose = require("mongoose")
+
 
 
 var server = express( );
@@ -15,26 +17,61 @@ server.use( function ( req, res, next ) {
 });
 
 // Data
-var data = require( "./data.js" );
+var postsModel = require( "./data.js" );
 
 server.get("/posts", function (req, res) {
-  console.log(req.body)
-  var response = {
-    posts: data.posts
-  };
-  res.json(response);
+  postsModel.find().then(function(posts){
+    var response = {
+      posts: posts
+    }
+    res.json(response)
+  }).catch(function (error) {
+    var response = {
+      msg: error.message
+    };
+    res.status(400);
+    res.json(response);
+  })
+  // console.log(req.body)
+  // var response = {
+  //   posts: postsModel.posts
+  // };
+  // res.json(response);
 });
 server.post("/posts", function (req, res) {
-  var new_post= {
+  postsModel.create({
     title:req.body.title,
     author: req.body.author,
-    category: req.body.category,
-    date:req.body.date,
-    image:req.body.image,
-    text: req.body.text,
-  };
-  data.posts.unshift(new_post);
-  res.status(201);
-  res.send()
+     category: req.body.category,
+     //date: default,
+     image:req.body.image,
+     text: req.body.text,
+
+  }).then(function (new_post) {
+    res.status(201);
+    res.json(new_post)
+  }).catch(function (error) {
+    var response = {
+      msg: error.message
+    };
+    res.status(400);
+    res.json(response);
+  })
+  // var new_post= {
+  //   title:req.body.title,
+  //   author: req.body.author,
+  //   category: req.body.category,
+  //   date:req.body.date,
+  //   image:req.body.image,
+  //   text: req.body.text,
+  // };
+  // data.posts.unshift(new_post);
+  // res.status(201);
+  // res.send()
 })
-server.listen(port, function(){})
+
+mongoose.connect("mongodb+srv://smamua:smamua@cluster0-1j385.mongodb.net/Blog?retryWrites=true&w=majority", {
+  useNewUrlParser: true
+}).then(function () {
+  server.listen(port, function(){})
+})
